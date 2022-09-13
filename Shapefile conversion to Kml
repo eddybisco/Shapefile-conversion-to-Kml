@@ -1,0 +1,31 @@
+import ee
+#The first time you use the earthengine module, you need to link your account credentials. Afterwards, your
+#computer stores the authentication file
+
+#ee.Authenticate()
+#/home/username/credentials/earthengine/
+
+ee.Initialize()
+print(ee.__version__)
+
+import geemap
+Map = geemap.Map()
+Map
+
+import os
+import geopandas as gpd
+import pandas as pd
+
+file = os.listdir("/Users/enduranceebhodaghe/shapefile/")
+path = [os.path.join("/Users/enduranceebhodaghe/shapefile/", i) for i in file if ".shp" in i]
+
+gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(i) for i in path], 
+                        ignore_index=True), crs=gpd.read_file(path[0]).crs)
+                        
+gdf.to_file('shapefile.shp') 
+
+shapefile_shp = 'shapefile.shp'
+shapefile = geemap.shp_to_ee(shapefile_shp)
+Map.addLayer(shapefile , {}, 'shapefile ')
+
+geemap.ee_export_vector(shapefile, filename='/Users/enduranceebhodaghe/shapefile.kml')
